@@ -2,9 +2,21 @@
 """ creating a database engine"""
 
 from os import getenv
+from dotenv import load_dotenv
+from models.base_model import Base
+from models.base_model import BaseModel
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 from sqlalchemy import create_engine
-from sqlalchemy import sessionmaker
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
 
+load_dotenv()
 class DBStorage:
     '''instanciating class DBStorage.
        Attributes:
@@ -13,6 +25,7 @@ class DBStorage:
     '''
     __engine = None
     __session = None
+
     def __init__(self):
         '''initializing class DBStorage constructor.'''
         self.__engine = create_engine("mysql+mysqldb://{}:{}@{}/{}".
@@ -21,7 +34,7 @@ class DBStorage:
                                              getenv("HBNB_MYSQL_HOST"),
                                              getenv("HBNB_MYSQL_DB")),
                                       pool_pre_ping=True)
-        if getenv("HBNB_ENV") = test:
+        if getenv("HBNB_ENV") == "test":
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
@@ -30,12 +43,12 @@ class DBStorage:
         if cls is None:
             objs = self.__session.query(State).all()
             objs.extend(self.__session.query(City).all())
-            objs.extend(self.__session).query(Amenity).all())
-            objs.extend(self.__session).query(Place).all())
-            objs.extend(self.__session).query(Review).all())
-            objs.extend(self.__session).query(User).all())
+            objs.extend(self.__session.query(Amenity).all())
+            objs.extend(self.__session.query(Place).all())
+            objs.extend(self.__session.query(Review).all())
+            objs.extend(self.__session.query(User).all())
         else:
-            if type(cls) = str:
+            if type(cls) == str:
                 cls = eval(cls)
             obj = self.__session.query(cls)
         return {"{}.{}".format(type(o).__name__, o.id): o for o in objs}
